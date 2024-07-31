@@ -1,0 +1,126 @@
+/* CSS for homepage */
+#homePage .main-container {
+    max-width: 867px;
+    margin: auto;
+}
+
+#homePage .info-section {
+    background-color: #f0f8ff;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#homePage .info-section h2,
+#homePage .info-section h3 {
+    background-color: #87ceeb;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#homePage .info-section p {
+    background-color: #e6f7ff;
+    padding: 10px;
+}
+
+/* CSS for signup */
+#signupPage .form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#signupPage .btn-container {
+    text-align: center;
+}
+
+#signupPage .text-center {
+    text-align: center;
+}
+
+#signupPage .mt-2 {
+    margin-top: 1rem;
+}
+
+#signupPage .mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+#signupPage .terms-card {
+    margin-top: 20px;
+}
+
+/* CSS for login */
+#loginPage .form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#loginPage .btn-container {
+    text-align: center;
+}
+
+#loginPage .text-center {
+    text-align: center;
+}
+
+#loginPage .mt-2 {
+    margin-top: 1rem;
+}
+
+#loginPage .mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+/* CSS for bookslotpage */
+#bookslotPage .form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#bookslotPage .btn-container {
+    text-align: center;
+}
+
+#bookslotPage .text-center {
+    text-align: center;
+}
+
+#bookslotPage .mt-2 {
+    margin-top: 1rem;
+}
+
+#bookslotPage .mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+/* CSS for historypage */
+#historyPage .table-container {
+    max-width: 800px;
+    margin: auto;
+    margin-top: 50px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+#historyPage .table-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}

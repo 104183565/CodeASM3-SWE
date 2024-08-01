@@ -1,3 +1,4 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
 session_start(); // Start the session
 
@@ -63,6 +64,7 @@ $conn->close();
 
 <body>
 
+    <!------------------------------------------ Login Form ------------------------------------------>
     <div id="loginPage">
         <div class="form-container">
             <form id="loginForm" class="loginForm" method="post" action="">
@@ -98,5 +100,4 @@ $conn->close();
     </div>
 
 </body>
-
 </html>

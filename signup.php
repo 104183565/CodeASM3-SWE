@@ -1,10 +1,13 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-session_start(); // Start the session
+// Start the session
+session_start();
 
 // Initialize error messages
 $error_msgs = []; // Use an array to store multiple error messages
 $success_msg = '';
 
+// Connect to the database
 include "settings.php";
 
 // Check if the TheParkingslot_User table exists, if not create it
@@ -110,46 +113,67 @@ $conn->close();
 </head>
 
 <body>
+
+    <!------------------------------------------ Signup Form ------------------------------------------>
     <div id="signupPage">
         <div id="signupForm" class="container">
+
             <div class="form-container">
                 <h2 class="text-center mb-4">Registration</h2>
+
+                <!-- Form for user registration -->
                 <form id="signupForm" class="signupForm" method="post" action="">
                     <div class="form-row">
+
                         <div class="form-group">
                             <label for="firstname">First Name</label>
+                            <!-- Input for first name -->
                             <input type="text" class="form-control" id="firstname" name="fname"
                                 value="<?php echo htmlspecialchars($fname ?? '', ENT_QUOTES); ?>" required>
                         </div>
+
                         <div class="form-group">
                             <label for="lastname">Last Name</label>
+                            <!-- Input for last name -->
                             <input type="text" class="form-control" id="lastname" name="lname"
                                 value="<?php echo htmlspecialchars($lname ?? '', ENT_QUOTES); ?>" required>
                         </div>
+
                     </div>
+
                     <div class="form-group">
                         <label for="username">User Name</label>
+                        <!-- Input for username -->
                         <input type="text" class="form-control" id="username" name="username"
                             value="<?php echo htmlspecialchars($username ?? '', ENT_QUOTES); ?>" required>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="password">Password</label>
+                            <!-- Input for password -->
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
+
                         <div class="form-group">
                             <label for="confirmpassword">Re-password</label>
+                            <!-- Input for confirming password -->
                             <input type="password" class="form-control" id="confirmpassword" name="confirmpassword"
                                 required>
                         </div>
+
                     </div>
+
                     <div class="form-group">
                         <label for="email">Email</label>
+                        <!-- Input for email -->
                         <input type="email" class="form-control" id="email" name="email"
                             value="<?php echo htmlspecialchars($email ?? '', ENT_QUOTES); ?>" required>
                     </div>
+
                     <div class="form-group">
                         <div id="error-msg" class="text-danger">
+                            <!-- Display error messages, if any -->
                             <?php if (!empty($error_msgs)) {
                                 foreach ($error_msgs as $msg) {
                                     echo $msg . "<br>";
@@ -157,8 +181,10 @@ $conn->close();
                             } ?>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <div id="success-msg" class="text-success">
+                            <!-- Display success message, if any -->
                             <?php if ($success_msg)
                                 echo $success_msg; ?>
                         </div>
@@ -166,9 +192,12 @@ $conn->close();
 
                     <br>
                     <div class="form-group btn-container">
+                        <!-- Submit button for the registration form -->
                         <button type="submit" class="btn btn-success">Submit</button>
                     </div>
+
                     <div class="form-group text-center">
+                        <!-- Link to the login page if the user already has an account -->
                         <p>Have an account? <a href="login.php">Log in here</a></p>
                     </div>
 
@@ -176,6 +205,7 @@ $conn->close();
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

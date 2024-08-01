@@ -1,5 +1,7 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-session_start(); // Start the session
+// Start the session
+session_start();
 
 // Get booking information from session
 $bookingSlots = isset($_SESSION['bookingDetails']) ? $_SESSION['bookingDetails'] : [];
@@ -36,13 +38,17 @@ foreach ($bookingSlots as $slot) {
 </head>
 
 <body>
+
+  <!------------------------------------------ Navigation bar ------------------------------------------>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
       <a class="navbar-brand" href="home.php">Smart Parking System</a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
@@ -56,15 +62,19 @@ foreach ($bookingSlots as $slot) {
           </li>
         </ul>
       </div>
+
     </div>
   </nav>
 
+  <!------------------------------------------ Print out the data for Receipt ------------------------------------------>
   <div class="container mt-5">
     <h2>Booking Confirmation</h2>
+    <!-- Confirmation message for successful booking -->
     <p class="success-message">Thank you, <?php echo htmlspecialchars($customerName); ?>! Your booking has been
       successfully completed.</p>
 
     <h4>Your Booking Details</h4>
+    <!-- Table displaying booking details -->
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -77,8 +87,10 @@ foreach ($bookingSlots as $slot) {
         </tr>
       </thead>
       <tbody>
+        <!-- Loop through each slot in the booking list and display the information -->
         <?php foreach ($bookingSlots as $slot): ?>
           <?php
+          // Calculate the price for the slot based on the booked time
           $hoursBooked = isset($slot['time']) ? intval($slot['time']) : 1;
           $hourlyRate = 30;
           $slotPrice = $hoursBooked * $hourlyRate;
@@ -95,10 +107,13 @@ foreach ($bookingSlots as $slot) {
       </tbody>
     </table>
 
+    <!-- Display the total amount for all booked slots -->
     <h4>Total Amount: $<?php echo number_format($totalAmount, 2); ?></h4>
 
+    <!-- Button to book another slot -->
     <a href="bookslot.php" class="btn btn-primary">Book Another Slot</a>
   </div>
+
 </body>
 
 </html>

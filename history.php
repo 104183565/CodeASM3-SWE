@@ -1,5 +1,7 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-session_start(); // Start the session
+// Start the session
+session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -7,9 +9,11 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
+// Get the username from the session
+$username = $_SESSION['username'];
 
-include "settings.php"; // Connect to the database
+// Connect to the database
+include "settings.php";
 
 // Get user_id from the session
 $user_id = $_SESSION['user_id'];
@@ -38,6 +42,8 @@ $result = $conn->query($query);
 </head>
 
 <body>
+
+    <!------------------------------------------ Navigation bar ------------------------------------------>
     <div id="historyPage">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
@@ -62,13 +68,14 @@ $result = $conn->query($query);
             </div>
         </nav>
 
+        <!------------------------------------------ Booking History ------------------------------------------>
         <div class="table-container">
             <h2>Booking History</h2>
             <h4 class="text-center mb-4">User name: <?php echo htmlspecialchars($username); ?></h4>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Number of times booked</th> 
+                        <th>Number of times booked</th>
                         <th>Parking Type</th>
                         <th>Address</th>
                         <th>Vehicle Type</th>
@@ -78,6 +85,7 @@ $result = $conn->query($query);
                     </tr>
                 </thead>
                 <tbody>
+                    <!------------------------------------------ Retrieve the data from the database ------------------------------------------>
                     <?php
                     if ($result->num_rows > 0) {
                         // Hourly parking rate

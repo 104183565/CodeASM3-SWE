@@ -1,10 +1,13 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-session_start(); // Start the session
+// Start the session
+session_start();
 
 // Get the username from the session
 $username = $_SESSION['username'];
 $message = ''; // Variable to hold the message
 
+// Connect to the database
 include "settings.php";
 
 // Create table if it does not exist
@@ -36,9 +39,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $parking_type = $_POST['parkingType'];
     $booking_date = $_POST['dateOfBooking'];
     $address = $_POST['address'];
-    $selected_slots = isset($_POST['selectedSlots']) ? $_POST['selectedSlots'] : []; // Get selected slot information
-    $car_type = $_POST['carType']; // Get car type from the form
-    $car_type_text = ''; // Variable to hold the name of the car type
+    $selected_slots = isset($_POST['selectedSlots']) ? $_POST['selectedSlots'] : [];
+    $car_type = $_POST['carType'];
+    $car_type_text = '';
 
     // Determine slot_number and car_type_text based on the car type
     $slot_number = 0;
@@ -74,9 +77,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Store the name and address in the session
     $_SESSION['customer_name'] = $username;
-    $_SESSION['customer_address'] = $address; 
-    $_SESSION['parkingType'] = $parking_type; 
-    $_SESSION['dateOfBooking'] = $booking_date; 
+    $_SESSION['customer_address'] = $address;
+    $_SESSION['parkingType'] = $parking_type;
+    $_SESSION['dateOfBooking'] = $booking_date;
     $_SESSION['selectedSlots'] = $selected_slots;
 
     // Variable to hold booking information
@@ -94,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'time' => $slot_time,
                 'slot_number' => $slot_number,
                 'car_type_text' => $car_type_text,
-                'parking_type' => $parking_type, 
+                'parking_type' => $parking_type,
                 'booking_date' => $booking_date
             ];
         }
@@ -105,9 +108,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $message = "Reservation successful!";
     echo "<script>window.location.href = 'invoice.php';</script>";
-    exit(); 
+    exit();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -129,6 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    <!------------------------------------------ Navigation bar ------------------------------------------>
     <div id="bookslotPage">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
@@ -153,6 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </nav>
 
+        <!------------------------------------------ Bookingslot Form ------------------------------------------>
         <div class="container mt-5">
             <div class="form-container">
                 <h2 class="text-center mb-4">Book a Parking Slot</h2>
@@ -234,13 +238,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
-    
+
 
     <script>
         // This function generates the time slot table
         function generateSlotTable() {
             const slotTableBody = document.getElementById('slotTableBody');
-            slotTableBody.innerHTML = ''; 
+            slotTableBody.innerHTML = '';
 
             const timeSlots = [
                 '00:00-03:00', '03:00-06:00', '06:00-09:00', '09:00-12:00',
@@ -250,7 +254,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Create a new row
             const row = document.createElement('tr');
             row.innerHTML = `<td id="slotName">${document.getElementById('carType').value}</td>`;
-            
+
             // Create checkbox inputs for each time slot
             timeSlots.forEach(slot => {
                 const cell = document.createElement('td');
@@ -263,8 +267,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         document.getElementById('carType').addEventListener('change', function () {
             const selectedCarTypeValue = this.value;
-            document.getElementById('slotName').textContent = selectedCarTypeValue; 
-            generateSlotTable(); 
+            document.getElementById('slotName').textContent = selectedCarTypeValue;
+            generateSlotTable();
         });
 
         document.getElementById('dateOfBooking').addEventListener('change', function () {
@@ -303,17 +307,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // If there are errors, display the error messages
             if (errorMessage) {
                 alert(errorMessage);
-                return; 
+                return;
             }
 
             // If all information is valid, store the selected slots in a hidden input
             document.getElementById('selectedSlotsInput').value = selectedSlots.join(',');
-            alert('Reservation successful!'); 
-            document.getElementById('bookingForm').submit(); 
+            alert('Reservation successful!');
+            document.getElementById('bookingForm').submit();
         }
     </script>
 
-     <!-- Script for CSS
+    <!-- Script for CSS
      <script src="javascript/bookslot.js"></script> -->
 </body>
 

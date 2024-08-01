@@ -1,10 +1,14 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
+// Start the session
 session_start();
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
 
+// Check if the user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    // If not logged in, redirect to the login page
+    header("Location: login.php");
+    exit(); // Stop executing the code after the redirect
+}
 ?>
 
 
@@ -27,6 +31,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 </head>
 
 <body>
+
+    <!------------------------------------------ Navigation bar ------------------------------------------>
     <div id="homePage">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
@@ -51,6 +57,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             </div>
         </nav>
 
+        <!------------------------------------------ Informatio and how to use webpage ------------------------------------------>
         <div class="main-container mt-4">
             <div class="info-section text-center mb-4">
                 <h2>Welcome to the Smart Parking System</h2>

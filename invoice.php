@@ -1,5 +1,7 @@
+<!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-session_start(); // Start the session
+// Start the session
+session_start();
 
 // Get booking information from the session
 $bookingSlots = isset($_SESSION['bookingDetails']) ? $_SESSION['bookingDetails'] : [];
@@ -28,16 +30,22 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
 </head>
 
 <body>
+
+  <!------------------------------------------ Invoice Generator ------------------------------------------>
   <div class="container mt-5">
     <h2>Invoice Generator</h2>
     <form id="invoiceForm">
-        <div class="col-sm-10">
-          <p id="customerName" class="form-control-plaintext">Customer Name: <?php echo htmlspecialchars($customerName); ?></p>
-        </div>
-   
-        <div class="col-sm-10">
-          <p id="customerAddress" class="form-control-plaintext">Customer Address: <?php echo htmlspecialchars($customerAddress); ?></p>
-        </div>
+      <div class="col-sm-10">
+        <p id="customerName" class="form-control-plaintext">Customer Name:
+          <?php echo htmlspecialchars($customerName); ?>
+        </p>
+      </div>
+
+      <div class="col-sm-10">
+        <p id="customerAddress" class="form-control-plaintext">Customer Address:
+          <?php echo htmlspecialchars($customerAddress); ?>
+        </p>
+      </div>
 
       <div class="mb-3 row">
         <label for="fee" class="col-sm-2 col-form-label">Fee per hour: $30</label>
@@ -80,7 +88,7 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
         invoice.addItem(`Slot Number: ${slot.slot_number}, Slot Time: ${slot.time} hours, Car Type: ${slot.car_type_text}, Parking Spot: ${slot.parking_type}, Booking Date: ${slot.booking_date}`, price);
       });
 
-      // Display invoice summary
+      //------------------------------------------------------ Display invoice summary ------------------------------------------------------//
       const summaryContainer = document.getElementById('invoiceSummary');
       summaryContainer.innerHTML = `
       <h4>Booking Details</h4>
@@ -121,8 +129,8 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
         </thead>
         <tbody>
           ${invoice.items.map((item, index) => {
-            const details = item.description.split(', '); // Split the description to get individual details
-            return `
+        const details = item.description.split(', '); // Split the description to get individual details
+        return `
             <tr>
               <td>${index + 1}</td> 
               <td>${details[0].split(': ')[1]}</td>
@@ -133,7 +141,7 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
               <td>$${item.price.toFixed(2)}</td>
             </tr>
           `;
-          }).join('')}
+      }).join('')}
         </tbody>
         <tfoot>
           <tr class="total-row">    
@@ -183,7 +191,7 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
     }
   </script>
 
-    <!-- Script for CSS
+  <!-- Script for CSS
      <script src="javascript/invoice.js"></script> -->
 </body>
 

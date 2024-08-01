@@ -1,25 +1,13 @@
 <?php
-session_start(); // Bắt đầu phiên làm việc
+session_start(); // Start the session
 
-// Khởi tạo biến thông báo
-$error_msgs = []; // Sử dụng mảng để lưu trữ nhiều thông báo lỗi
+// Initialize error messages
+$error_msgs = []; // Use an array to store multiple error messages
 $success_msg = '';
 
-// Truy cập vào database
-$host = "localhost";
-$user = "root";
-$pswd = "";
-$dbnm = "test";
+include "settings.php";
 
-// Mở kết nối
-$conn = new mysqli($host, $user, $pswd, $dbnm);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Kiểm tra bảng TheParkingslot_User có tồn tại không, nếu không thì tạo
+// Check if the TheParkingslot_User table exists, if not create it
 $table_check_query = "SHOW TABLES LIKE 'TheParkingslot_User'";
 $table_check_result = $conn->query($table_check_query);
 
@@ -40,10 +28,10 @@ if ($table_check_result->num_rows == 0) {
     }
 }
 
-// Khởi tạo các biến lưu trữ giá trị đầu vào
+// Initialize variables to store input values
 $fname = $lname = $username = $email = $password = $confirmpassword = '';
 
-// Kiểm tra dữ liệu từ POST
+// Check POST data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fname = $_POST['fname'];
     $lname = $_POST['lname'];
@@ -52,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirmpassword = $_POST['confirmpassword'];
 
-    // Kiểm tra pattern
+    // Validate input patterns
     if (!preg_match("/^[a-zA-Z ]+$/", $fname)) {
         $error_msgs[] = "Invalid first name.";
     }
@@ -72,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_msgs[] = "Passwords do not match.";
     }
 
-    // Kiểm tra username và email đã tồn tại hay chưa
+    // Check if the username and email already exist
     $username_check_query = "SELECT * FROM TheParkingslot_User WHERE username = '$username'";
     $username_check_result = $conn->query($username_check_query);
 
@@ -86,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_msgs[] = "Email already exists.";
     }
 
-    // Nếu không có lỗi, thực hiện thêm dữ liệu vào bảng
+    // If there are no errors, insert data into the table
     if (empty($error_msgs)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $insert_query = "INSERT INTO TheParkingslot_User (fname, lname, username, password, email) VALUES ('$fname', '$lname', '$username', '$hashed_password', '$email')";
@@ -99,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Đóng kết nối
+// Close the connection
 $conn->close();
 ?>
 
@@ -113,7 +101,7 @@ $conn->close();
     <meta name="description" content="Assignment 3 - SWE30003">
     <title>Smart Parking System - Sign Up</title>
 
-    <!-- Bootstrap CSS & JS  -->
+    <!-- Bootstrap CSS & JS -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 

@@ -1,32 +1,22 @@
 <?php
-session_start(); // Bắt đầu phiên làm việc
+session_start(); // Start the session
 
-// Kiểm tra xem người dùng đã đăng nhập chưa
+// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+    header("Location: login.php"); // If not logged in, redirect to the login page
     exit();
 }
 
-// Truy cập vào database
-$host = "localhost";
-$user = "root";
-$pswd = "";
-$dbnm = "test";
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
 
-// Mở kết nối
-$conn = new mysqli($host, $user, $pswd, $dbnm);
+include "settings.php"; // Connect to the database
 
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Lấy user_id từ session
+// Get user_id from the session
 $user_id = $_SESSION['user_id'];
 
-// Truy vấn để lấy thông tin đặt chỗ của người dùng
-$sql = "SELECT * FROM TheParkingslot_Information WHERE user_id = '$user_id' ORDER BY created_at DESC";
-$result = $conn->query($sql);
+// Query booking history
+$query = "SELECT * FROM TheParkingslot_Information WHERE user_id = $user_id";
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -43,24 +33,8 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <style>
-        #historyPage .table-container {
-            max-width: 800px;
-            margin: auto;
-            margin-top: 50px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: #f9f9f9;
-        }
-
-        #historyPage .table-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-    </style>
+    <!-- Script for CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -90,47 +64,52 @@ $result = $conn->query($sql);
 
         <div class="table-container">
             <h2>Booking History</h2>
+            <h4 class="text-center mb-4">User name: <?php echo htmlspecialchars($username); ?></h4>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Number of Slots</th>
+                        <th>Number of times booked</th> 
+                        <th>Parking Type</th>
+                        <th>Address</th>
                         <th>Vehicle Type</th>
-                        <th>Rental Hours</th>
+                        <th>Slot Time</th>
                         <th>Booking Date</th>
-                        <th>Total Price (VND)</th>
-                        <th>Created At</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     if ($result->num_rows > 0) {
-                        // Hiển thị dữ liệu của mỗi hàng
+                        // Hourly parking rate
+                        $hourlyRate = 30;
+                        // Counter for order number
+                        $counter = 1;
+
+                        // Display each row of data
                         while ($row = $result->fetch_assoc()) {
+                            // Calculate total cost
+                            $slotTime = isset($row['slot_time']) ? intval($row['slot_time']) : 1;
+                            $totalCost = $slotTime * $hourlyRate;
+
                             echo "<tr>
-                                <td>{$row['id']}</td>
-                                <td>{$row['number_of_slots']}</td>
-                                <td>{$row['vehicle_type']}</td>
-                                <td>{$row['rental_hours']}</td>
-                                <td>{$row['booking_date']}</td>
-                                <td>{$row['total_price']}</td>
-                                <td>{$row['created_at']}</td>
-                              </tr>";
+                                <td>" . $counter++ . "</td> <!-- Order number -->
+                                <td>" . htmlspecialchars($row['parking_type']) . "</td>
+                                <td>" . htmlspecialchars($row['address']) . "</td>
+                                <td>" . htmlspecialchars($row['car_type']) . "</td>
+                                <td>" . htmlspecialchars($row['slot_time']) . "</td>
+                                <td>" . htmlspecialchars($row['booking_date']) . "</td>
+                                <td>$" . number_format($totalCost, 2) . "</td> 
+                            </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='7' class='text-center'>No booking history found.</td></tr>";
+                        echo "<tr><td colspan='8' class='text-center'>No bookings found.</td></tr>";
                     }
                     ?>
                 </tbody>
             </table>
         </div>
-  
 
-    <?php
-    // Đóng kết nối
-    $conn->close();
-    ?>
-      </div>
+    </div>
 </body>
 
 </html>

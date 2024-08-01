@@ -1,5 +1,113 @@
 <?php
-session_start(); // Bắt đầu phiên làm việc
+session_start(); // Start the session
+
+// Get the username from the session
+$username = $_SESSION['username'];
+$message = ''; // Variable to hold the message
+
+include "settings.php";
+
+// Create table if it does not exist
+$table_create_query = "
+CREATE TABLE IF NOT EXISTS TheParkingslot_Information (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    parking_type VARCHAR(50) NOT NULL,
+    booking_date DATE NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    slot_time VARCHAR(50) NOT NULL,
+    slot_number INT NOT NULL,
+    car_type VARCHAR(50) NOT NULL,
+    car_type_text VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES TheParkingslot_User(id) ON DELETE CASCADE
+);";
+
+if ($conn->query($table_create_query) === TRUE) {
+    // Table was created successfully or already exists
+} else {
+    echo "Error creating table: " . $conn->error;
+}
+
+// Get user_id from session
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; // Assume user_id is stored in the session when the user logs in
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get information from the form
+    $parking_type = $_POST['parkingType'];
+    $booking_date = $_POST['dateOfBooking'];
+    $address = $_POST['address'];
+    $selected_slots = isset($_POST['selectedSlots']) ? $_POST['selectedSlots'] : []; // Get selected slot information
+    $car_type = $_POST['carType']; // Get car type from the form
+    $car_type_text = ''; // Variable to hold the name of the car type
+
+    // Determine slot_number and car_type_text based on the car type
+    $slot_number = 0;
+    switch ($car_type) {
+        case 'Slot 1':
+            $slot_number = 1;
+            $car_type_text = '4-seat car';
+            break;
+        case 'Slot 2':
+            $slot_number = 2;
+            $car_type_text = '7-seat car';
+            break;
+        case 'Slot 3':
+            $slot_number = 3;
+            $car_type_text = '12-seat car';
+            break;
+        case 'Slot 4':
+            $slot_number = 4;
+            $car_type_text = '20-seat car';
+            break;
+        case 'Slot 5':
+            $slot_number = 5;
+            $car_type_text = '36-seat car';
+            break;
+        case 'Slot 6':
+            $slot_number = 6;
+            $car_type_text = '54-seat car';
+            break;
+        default:
+            $slot_number = 0; // If there is no valid car type
+            $car_type_text = 'Unknown car type';
+    }
+
+    // Store the name and address in the session
+    $_SESSION['customer_name'] = $username;
+    $_SESSION['customer_address'] = $address; 
+    $_SESSION['parkingType'] = $parking_type; 
+    $_SESSION['dateOfBooking'] = $booking_date; 
+    $_SESSION['selectedSlots'] = $selected_slots;
+
+    // Variable to hold booking information
+    $bookingDetails = [];
+
+    // Insert information into the table for each selected slot
+    foreach ($selected_slots as $slot_time) {
+        $insert_query = "INSERT INTO TheParkingslot_Information (user_id, parking_type, booking_date, address, slot_time, slot_number, car_type, car_type_text) VALUES ('$user_id', '$parking_type', '$booking_date', '$address', '$slot_time', '$slot_number', '$car_type', '$car_type_text')"; // Add car type to the query
+
+        if ($conn->query($insert_query) !== TRUE) {
+            $message = "Error: " . $insert_query . "<br>" . $conn->error;
+        } else {
+            // Save information of booked slots into the array
+            $bookingDetails[] = [
+                'time' => $slot_time,
+                'slot_number' => $slot_number,
+                'car_type_text' => $car_type_text,
+                'parking_type' => $parking_type, 
+                'booking_date' => $booking_date
+            ];
+        }
+    }
+
+    // Save booking information into the session
+    $_SESSION['bookingDetails'] = $bookingDetails;
+
+    $message = "Reservation successful!";
+    echo "<script>window.location.href = 'invoice.php';</script>";
+    exit(); 
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -18,10 +126,6 @@ session_start(); // Bắt đầu phiên làm việc
 
     <!-- Script for CSS -->
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-
-    </style>
 </head>
 
 <body>
@@ -50,133 +154,167 @@ session_start(); // Bắt đầu phiên làm việc
         </nav>
 
         <div class="container mt-5">
-            <div class="form-container"> <!-- Thêm class form-container -->
+            <div class="form-container">
                 <h2 class="text-center mb-4">Book a Parking Slot</h2>
-                <form action="bookslot.php" method="post" class="mt-4">
+                <form id="bookingForm" action="bookslot.php" method="post" class="mt-4">
+                    <h4 class="text-center mb-4">User name: <?php echo htmlspecialchars($username); ?></h4>
+
                     <div class="mb-3">
-                        <label for="numberOfSlots" class="form-label">Number of Slots:</label>
-                        <input type="number" id="numberOfSlots" name="numberOfSlots" class="form-control"
-                            placeholder="Please enter your number of slot" required oninput="updateTotalPrice()">
-                    </div>
-                    <div class="mb-3">
-                        <label for="carType" class="form-label">Vehicle Type:</label>
+                        <label for="carType" class="form-label">Car Type:</label>
                         <select id="carType" name="carType" class="form-select" required>
-                            <option value="" disabled selected>Select a vehicle type</option>
-                            <option value="SUV">SUV</option>
-                            <option value="sedan">Sedan</option>
-                            <option value="supercar">Super Car</option>
+                            <option value="" disabled selected>Select a car type</option>
+                            <option value="Slot 1">4-seat car</option>
+                            <option value="Slot 2">7-seat car</option>
+                            <option value="Slot 3">12-seat car</option>
+                            <option value="Slot 4">20-seat car</option>
+                            <option value="Slot 5">36-seat car</option>
+                            <option value="Slot 6">54-seat car</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="parkingType" class="form-label">Parking Spot:</label>
+                        <select id="parkingType" name="parkingType" class="form-select" required>
+                            <option value="" disabled selected>Select a parking spot</option>
+                            <option value="Outdoor">Outdoor</option>
+                            <option value="Garage">Garage</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="hoursToRent" class="form-label">Rental Hours:</label>
-                        <input type="number" id="hoursToRent" name="hoursToRent" class="form-control"
-                            placeholder="Please enter your rental hours" required oninput="updateTotalPrice()">
+                        <label for="dateOfBooking" class="form-label">Booking Date:</label>
+                        <input type="date" id="dateOfBooking" name="dateOfBooking" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="dateOfBooking" class="form-label">Booking Date:</label>
-                        <input type="date" id="dateOfBooking" name="dateOfBooking" class="form-control"
-                            placeholder="Please enter your booking date" required>
-                    </div>
-                    <div class="mb-3 d-flex align-items-center">
-                        <label class="me-2 mb-0">Total Price (30K/hour):</label>
-                        <p id="calculatedPrice" class="mb-0">0 VND</p>
+                        <label for="address" class="form-label">Address:</label>
+                        <input type="text" id="address" name="address" class="form-control"
+                            placeholder="Enter your address" required>
                     </div>
 
-                    <div class="btn-container">
-                        <button type="submit" class="btn btn-success">Book Slot</button>
+                    <!-- Slot Reservation System -->
+                    <div class="container mt-5" id="slotReservationSystem" style="display: none;">
+                        <h2>Slot Reservation System</h2>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Slot</th>
+                                    <th scope="col">00:00-03:00</th>
+                                    <th scope="col">03:00-06:00</th>
+                                    <th scope="col">06:00-09:00</th>
+                                    <th scope="col">09:00-12:00</th>
+                                    <th scope="col">12:00-15:00</th>
+                                    <th scope="col">15:00-18:00</th>
+                                    <th scope="col">18:00-21:00</th>
+                                    <th scope="col">21:00-24:00</th>
+                                    <th scope="col">24:00-00:00</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slotTableBody">
+                                <tr>
+                                    <td id="slotName"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="00:00-03:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="03:00-06:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="06:00-09:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="09:00-12:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="12:00-15:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="15:00-18:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="18:00-21:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="21:00-24:00"></td>
+                                    <td><input type="checkbox" name="selectedSlots" value="24:00-00:00"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="hidden" name="selectedSlots[]" id="selectedSlotsInput" value="">
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-primary" onclick="submitReservation()">Submit
+                            Reservation</button>
                     </div>
                 </form>
+                <p class="text-center text-danger"><?php echo $message; ?></p>
             </div>
         </div>
     </div>
+    
 
     <script>
-        function updateTotalPrice() {
-            const numberOfSlots = document.getElementById('numberOfSlots').value;
-            const hoursToRent = document.getElementById('hoursToRent').value;
-            const pricePerHour = 30000; // giá mỗi giờ
+        // This function generates the time slot table
+        function generateSlotTable() {
+            const slotTableBody = document.getElementById('slotTableBody');
+            slotTableBody.innerHTML = ''; 
 
-            // Tính tổng giá
-            const totalPrice = numberOfSlots * hoursToRent * pricePerHour;
+            const timeSlots = [
+                '00:00-03:00', '03:00-06:00', '06:00-09:00', '09:00-12:00',
+                '12:00-15:00', '15:00-18:00', '18:00-21:00', '21:00-24:00', '24:00-00:00'
+            ];
 
-            // Cập nhật giá vào phần tử hiển thị
-            document.getElementById('calculatedPrice').innerText = totalPrice + " VND";
+            // Create a new row
+            const row = document.createElement('tr');
+            row.innerHTML = `<td id="slotName">${document.getElementById('carType').value}</td>`;
+            
+            // Create checkbox inputs for each time slot
+            timeSlots.forEach(slot => {
+                const cell = document.createElement('td');
+                cell.innerHTML = `<input type="checkbox" name="selectedSlots" value="${slot}">`;
+                row.appendChild(cell);
+            });
+
+            slotTableBody.appendChild(row);
+        }
+
+        document.getElementById('carType').addEventListener('change', function () {
+            const selectedCarTypeValue = this.value;
+            document.getElementById('slotName').textContent = selectedCarTypeValue; 
+            generateSlotTable(); 
+        });
+
+        document.getElementById('dateOfBooking').addEventListener('change', function () {
+            document.getElementById('slotReservationSystem').style.display = 'block';
+            generateSlotTable();
+        });
+
+        function submitReservation() {
+            const carType = document.getElementById('carType').value;
+            const parkingType = document.getElementById('parkingType').value;
+            const bookingDate = document.getElementById('dateOfBooking').value;
+            const address = document.getElementById('address').value;
+            const selectedSlots = Array.from(document.querySelectorAll('input[name="selectedSlots"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Variable to hold error messages
+            let errorMessage = '';
+
+            // Check required fields and create corresponding error messages
+            if (!carType) {
+                errorMessage += 'Please select a car type.\n';
+            }
+            if (!parkingType) {
+                errorMessage += 'Please select a parking spot.\n';
+            }
+            if (!bookingDate) {
+                errorMessage += 'Please select a booking date.\n';
+            }
+            if (!address) {
+                errorMessage += 'Please enter your address.\n';
+            }
+            if (selectedSlots.length === 0) {
+                errorMessage += 'Please select at least one time slot.\n';
+            }
+
+            // If there are errors, display the error messages
+            if (errorMessage) {
+                alert(errorMessage);
+                return; 
+            }
+
+            // If all information is valid, store the selected slots in a hidden input
+            document.getElementById('selectedSlotsInput').value = selectedSlots.join(',');
+            alert('Reservation successful!'); 
+            document.getElementById('bookingForm').submit(); 
         }
     </script>
 
-    <?php
-    // Kiểm tra dữ liệu từ POST
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Truy cập vào database
-        $host = "localhost";
-        $user = "root";
-        $pswd = "";
-        $dbnm = "test";
-
-        // Mở kết nối
-        $conn = new mysqli($host, $user, $pswd, $dbnm);
-
-        // Kiểm tra kết nối
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        // Tạo bảng nếu chưa tồn tại
-        $create_table_query = "
-        CREATE TABLE IF NOT EXISTS TheParkingslot_Information (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            number_of_slots INT NOT NULL,
-            vehicle_type VARCHAR(50) NOT NULL,
-            rental_hours INT NOT NULL,
-            booking_date DATE NOT NULL,
-            total_price INT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES TheParkingslot_User(id) ON DELETE CASCADE
-        )";
-
-        if ($conn->query($create_table_query) !== TRUE) {
-            die("Error creating table: " . $conn->error);
-        }
-
-        // Lấy user_id từ session
-        $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-
-        if ($user_id === null) {
-            die("You must be logged in to book a slot."); // Hiển thị thông báo nếu chưa đăng nhập
-        }
-
-        // Lấy dữ liệu từ form
-        $numberOfSlots = $_POST['numberOfSlots'];
-        $carType = $_POST['carType'];
-        $hoursToRent = $_POST['hoursToRent'];
-        $dateOfBooking = $_POST['dateOfBooking'];
-        $totalPrice = $hoursToRent * $numberOfSlots * 30000; // Tính tổng giá
-    
-        // Chuẩn bị câu truy vấn để lưu thông tin
-        $sql = "INSERT INTO TheParkingslot_Information (user_id, number_of_slots, vehicle_type, rental_hours, booking_date, total_price)
-                VALUES ('$user_id', '$numberOfSlots', '$carType', '$hoursToRent', '$dateOfBooking', '$totalPrice')";
-
-        // Sau khi bạn đã lưu thông tin hóa đơn
-        if ($conn->query($sql) === TRUE) {
-            // Lưu thông tin vào session
-            $_SESSION['invoice'] = [
-                'user_id' => $user_id,
-                'number_of_slots' => $numberOfSlots,
-                'vehicle_type' => $carType,
-                'rental_hours' => $hoursToRent,
-                'booking_date' => $dateOfBooking,
-                'total_price' => $totalPrice
-            ];
-
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-
-        // Đóng kết nối
-        $conn->close();
-    }
-    ?>
+     <!-- Script for CSS
+     <script src="javascript/bookslot.js"></script> -->
 </body>
 
 </html>

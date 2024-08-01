@@ -1,4 +1,4 @@
-/* CSS for homepage */
+/*---------------------------------------- CSS for homepage ---------------------------------------- */
 #homePage .main-container {
     max-width: 867px;
     margin: auto;
@@ -25,7 +25,8 @@
     padding: 10px;
 }
 
-/* CSS for signup */
+
+/*---------------------------------------- CSS for signup ---------------------------------------- */
 #signupPage .form-container {
     max-width: 500px;
     margin: 50px auto;
@@ -55,7 +56,8 @@
     margin-top: 20px;
 }
 
-/* CSS for login */
+
+/*---------------------------------------- CSS for login ---------------------------------------- */
 #loginPage .form-container {
     max-width: 500px;
     margin: 50px auto;
@@ -81,9 +83,10 @@
     margin-bottom: 1.5rem;
 }
 
-/* CSS for bookslotpage */
+
+/*---------------------------------------- CSS for bookslotpage ---------------------------------------- */
 #bookslotPage .form-container {
-    max-width: 500px;
+    max-width: 700px;
     margin: 50px auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -91,9 +94,6 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#bookslotPage .btn-container {
-    text-align: center;
-}
 
 #bookslotPage .text-center {
     text-align: center;
@@ -107,7 +107,7 @@
     margin-bottom: 1.5rem;
 }
 
-/* CSS for historypage */
+/*---------------------------------------- CSS for historypage ---------------------------------------- */
 #historyPage .table-container {
     max-width: 800px;
     margin: auto;
@@ -123,4 +123,11 @@
     text-align: center;
     margin-bottom: 20px;
     color: #333;
+}
+
+/* Success message for receipt.php */
+.success-message {
+    color: green;
+    font-weight: bold;
+    font-size: 1.2em;
 }

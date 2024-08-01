@@ -24,10 +24,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     <!-- Script for CSS -->
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-        
-    </style>
 </head>
 
 <body>

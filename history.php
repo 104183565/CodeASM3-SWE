@@ -40,6 +40,14 @@ $result = $conn->query($query); // Execute the query
 
     <!-- Link to custom CSS for additional styling -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-image: url('image/background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -77,7 +85,7 @@ $result = $conn->query($query); // Execute the query
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Number of times booked</th> <!-- Column for booking count -->
+                        <th>Number sesion</th> <!-- Column for booking count -->
                         <th>Slot number</th> <!-- Column for slot number -->
                         <th>Slot Time</th> <!-- Column for slot time -->
                         <th>Vehicle Type</th> <!-- Column for vehicle type -->

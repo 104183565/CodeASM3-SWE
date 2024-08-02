@@ -14,13 +14,11 @@ document.getElementById('invoiceForm').addEventListener('submit', function (even
     // Create invoice instance
     const invoice = new Invoice(Date.now(), customer);
 
-
     // Calculate price based on number of hours
     const hourlyRate = 30;
 
     // Add booking slot items to invoice
     bookingSlots.forEach(slot => {
-        // Assuming slot.time contains the number of hours booked
         const hoursBooked = slot.time ? parseInt(slot.time) : 1; // Default to 1 hour if not specified
         const price = hoursBooked * hourlyRate;
 
@@ -33,7 +31,7 @@ document.getElementById('invoiceForm').addEventListener('submit', function (even
         });
     });
 
-    //------------------------------------------------------ Display invoice summary ------------------------------------------------------//
+    // Display invoice summary
     const summaryContainer = document.getElementById('invoiceSummary');
     summaryContainer.innerHTML = `
       <h4>Booking Details</h4>
@@ -51,22 +49,22 @@ document.getElementById('invoiceForm').addEventListener('submit', function (even
             ${bookingSlots.map(slot => {
         const times = slot.time.split(',');
         return times.map(time => `
-                <tr>
-                  <td>${slot.slot_number}</td>
-                  <td>${time} hours</td>
-                  <td>${slot.car_type_text}</td>
-                  <td>${slot.parking_type}</td>
-                </tr>
-              `).join(''); // Create table rows for each booking slot
+                    <tr>
+                      <td>${slot.slot_number}</td>
+                      <td>${time} hours</td>
+                      <td>${slot.car_type_text}</td>
+                      <td>${slot.parking_type}</td>
+                    </tr>
+                `).join('');
     }).join('')}
           </tbody>
         </table>
-      ` : '<p>No booking details available.</p>'} <!-- Show message if no booking details -->
+      ` : '<p>No booking details available.</p>'}
       <h4>Invoice Details</h4>
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>Number of times booked</th>
+            <th>Number sesion</th>
             <th>Slot Number</th>
             <th>Slot Time</th>
             <th>Car Type</th>
@@ -77,41 +75,41 @@ document.getElementById('invoiceForm').addEventListener('submit', function (even
         </thead>
         <tbody>
           ${invoice.items.map((item, index) => {
-        const details = item.description.split(', '); // Split the description to get individual details
+        const details = item.description.split(', ');
         return `
-              <tr>
-                <td>${index + 1}</td> 
-                <td>${details[0].split(': ')[1]}</td>
-                <td>${details[1].split(': ')[1]}</td>
-                <td>${details[2].split(': ')[1]}</td>
-                <td>${details[3].split(': ')[1]}</td>
-                <td>${details[4].split(': ')[1]}</td>
-                <td>$${(item.price * 3).toFixed(2)}</td> <!-- Total price for each item -->
-              </tr>
-            `;
+                  <tr>
+                    <td>${index + 1}</td> 
+                    <td>${details[0].split(': ')[1]}</td>
+                    <td>${details[1].split(': ')[1]}</td>
+                    <td>${details[2].split(': ')[1]}</td>
+                    <td>${details[3].split(': ')[1]}</td>
+                    <td>${details[4].split(': ')[1]}</td>
+                    <td>$${(item.price * 3).toFixed(2)}</td>
+                  </tr>
+                `;
     }).join('')}
         </tbody>
         <tfoot>
           <tr class="total-row">    
             <td colspan="6">Total</td>
-          <td>$${(invoice.calculateTotal() * 3).toFixed(2)}</td> <!-- Total amount for all items -->
+            <td>$${(invoice.calculateTotal() * 3).toFixed(2)}</td>
           </tr>
         </tfoot>
       </table>
 
-<div class="text-center">
-  <form action="receipt.php" method="POST" class="d-inline" id="checkoutForm">
-    <input type="hidden" name="totalAmount" value="${(invoice.calculateTotal() * 3).toFixed(2)}"> <!-- Hidden input for total amount -->
-    <button type="submit" class="btn btn-primary btn-lg">Check Out</button>
-  </form>
-</div>
-
-      `;
+      <div class="text-center">
+        <form action="receipt.php" method="POST" class="d-inline" id="checkoutForm">
+          <input type="hidden" name="totalAmount" value="${(invoice.calculateTotal() * 3).toFixed(2)}"> <!-- Hidden input for total amount -->
+          <button type="submit" class="btn btn-primary btn-lg">Check Out</button>
+        </form>
+      </div>
+    `;
+    // Update checkout form event listener
     document.getElementById('checkoutForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the default form submission
 
-        // Show alert for successful checkout
-        alert('Checkout successful! Redirecting to receipt page...');
+        // Show alert for successful checkout with customer name
+        alert(' ' + customer.name + ' checkout successful!. Redirecting to receipt page...');
 
         // Submit the form immediately after the alert
         this.submit(); // Submit the form programmatically

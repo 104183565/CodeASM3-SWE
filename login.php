@@ -60,6 +60,14 @@ $conn->close();
 
     <!-- Script for CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-image: url('image/background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
 </head>
 
 <body>

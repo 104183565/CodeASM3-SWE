@@ -28,6 +28,14 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     <!-- Script for CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-image: url('image/background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -73,9 +81,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 </p>
                 <ul>
                     <li>Go to the 'Book Slot' section to fill out the parking reservation form.</li>
-                    <li>Go to the "Invoice" section to see the information you filled out in the "Booking Slot" section
-                        previously.</li>
-                    <li>Go to the "Receipt" section to see all the information you confirmed.</li>
                     <li>Access the 'History' section to review the booking history on the system.</li>
                     <li>If you don't have an account, you can easily sign up from the 'Sign Up' page.</li>
                 </ul>

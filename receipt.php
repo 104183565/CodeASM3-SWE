@@ -7,7 +7,7 @@ session_start();
 $bookingSlots = isset($_SESSION['bookingDetails']) ? $_SESSION['bookingDetails'] : [];
 
 // Get customer name and address from session
-$customerName = isset($_SESSION['customer_name']) ? $_SESSION['customer_name'] : 'Guest';
+$customerName = isset($_SESSION['customer_name']) ? $_SESSION['customer_name'] : '';
 
 
 // Get value from form if available

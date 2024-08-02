@@ -9,6 +9,7 @@ $bookingSlots = isset($_SESSION['bookingDetails']) ? $_SESSION['bookingDetails']
 // Get customer name and address from the session
 $customerName = isset($_SESSION['customer_name']) ? $_SESSION['customer_name'] : 'Guest';
 $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_address'] : '';
+
 ?>
 
 <!DOCTYPE html>
@@ -33,15 +34,17 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
 
   <!------------------------------------------ Invoice Generator ------------------------------------------>
   <div class="container mt-5">
-    <h2>Invoice Generator</h2>
+    <h2>Invoice</h2>
     <form id="invoiceForm">
       <div class="col-sm-10">
+        <!-- Display customer name -->
         <p id="customerName" class="form-control-plaintext">Customer Name:
           <?php echo htmlspecialchars($customerName); ?>
         </p>
       </div>
 
       <div class="col-sm-10">
+        <!-- Display customer address -->
         <p id="customerAddress" class="form-control-plaintext">Customer Address:
           <?php echo htmlspecialchars($customerAddress); ?>
         </p>
@@ -52,16 +55,19 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
       </div>
 
       <a href="bookslot.php" class="btn btn-secondary">Back</a>
-      <button type="submit" class="btn btn-primary">Generate Invoice</button>
+      <button type="submit" class="btn btn-primary">Generate Invoice Summary</button>
 
     </form>
     <br>
     <div class="invoice-summary" id="invoiceSummary"></div>
   </div>
 
+
+  <!------------------------------------------ JS code for Generate Invoice ------------------------------------------>
   <script>
+    // Event listener for the invoice form submission
     document.getElementById('invoiceForm').addEventListener('submit', function (event) {
-      event.preventDefault();
+      event.preventDefault(); // Prevent default form submission
 
       // Get customer details
       const customerName = document.getElementById('customerName').innerText;
@@ -82,10 +88,16 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
       // Add booking slot items to invoice
       bookingSlots.forEach(slot => {
         // Assuming slot.time contains the number of hours booked
-        const hoursBooked = slot.time ? parseInt(slot.time) : 1;
+        const hoursBooked = slot.time ? parseInt(slot.time) : 1; // Default to 1 hour if not specified
         const price = hoursBooked * hourlyRate;
 
-        invoice.addItem(`Slot Number: ${slot.slot_number}, Slot Time: ${slot.time} hours, Car Type: ${slot.car_type_text}, Parking Spot: ${slot.parking_type}, Booking Date: ${slot.booking_date}`, price);
+        // Split time into individual hours if it contains multiple hours
+        const times = slot.time.split(',');
+
+        // Add each time as an item to the invoice
+        times.forEach(time => {
+          invoice.addItem(`Slot Number: ${slot.slot_number}, Slot Time: ${time} hours, Car Type: ${slot.car_type_text}, Parking Spot: ${slot.parking_type}, Booking Date: ${slot.booking_date}`, hourlyRate);
+        });
       });
 
       //------------------------------------------------------ Display invoice summary ------------------------------------------------------//
@@ -103,17 +115,20 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
             </tr>
           </thead>
           <tbody>
-            ${bookingSlots.map(slot => `
+            ${bookingSlots.map(slot => {
+        const times = slot.time.split(',');
+        return times.map(time => `
                 <tr>
                   <td>${slot.slot_number}</td>
-                  <td>${slot.time} hours</td>
+                  <td>${time} hours</td>
                   <td>${slot.car_type_text}</td>
                   <td>${slot.parking_type}</td>
                 </tr>
-              `).join('')}
+              `).join(''); // Create table rows for each booking slot
+      }).join('')}
           </tbody>
         </table>
-      ` : '<p>No booking details available.</p>'}
+      ` : '<p>No booking details available.</p>'} <!-- Show message if no booking details -->
       <h4>Invoice Details</h4>
       <table class="table table-bordered">
         <thead>
@@ -124,41 +139,57 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
             <th>Car Type</th>
             <th>Parking Spot</th>
             <th>Booking Date</th>
-            <th>Price</th>
+            <th>Total</th>
           </tr>
         </thead>
         <tbody>
           ${invoice.items.map((item, index) => {
         const details = item.description.split(', '); // Split the description to get individual details
         return `
-            <tr>
-              <td>${index + 1}</td> 
-              <td>${details[0].split(': ')[1]}</td>
-              <td>${details[1].split(': ')[1]}</td>
-              <td>${details[2].split(': ')[1]}</td>
-              <td>${details[3].split(': ')[1]}</td>
-              <td>${details[4].split(': ')[1]}</td>
-              <td>$${item.price.toFixed(2)}</td>
-            </tr>
-          `;
+              <tr>
+                <td>${index + 1}</td> 
+                <td>${details[0].split(': ')[1]}</td>
+                <td>${details[1].split(': ')[1]}</td>
+                <td>${details[2].split(': ')[1]}</td>
+                <td>${details[3].split(': ')[1]}</td>
+                <td>${details[4].split(': ')[1]}</td>
+                <td>$${(item.price * 3).toFixed(2)}</td> <!-- Total price for each item -->
+              </tr>
+            `;
       }).join('')}
         </tbody>
         <tfoot>
           <tr class="total-row">    
             <td colspan="6">Total</td>
-            <td>$${invoice.calculateTotal().toFixed(2)}</td>
+          <td>$${(invoice.calculateTotal() * 3).toFixed(2)}</td> <!-- Total amount for all items -->
           </tr>
         </tfoot>
       </table>
-      <a href="receipt.php" class="btn btn-success">Check Out</a>
+
+<div class="text-center">
+  <form action="receipt.php" method="POST" class="d-inline" id="checkoutForm">
+    <input type="hidden" name="totalAmount" value="${(invoice.calculateTotal() * 3).toFixed(2)}"> <!-- Hidden input for total amount -->
+    <button type="submit" class="btn btn-primary btn-lg">Check Out</button>
+  </form>
+</div>
+
       `;
+      document.getElementById('checkoutForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Show alert for successful checkout
+        alert('Checkout successful! Redirecting to receipt page...');
+
+        // Submit the form immediately after the alert
+        this.submit(); // Submit the form programmatically
+      });
     });
 
     // Classes for Invoice
     class Item {
       constructor(description, price) {
-        this.description = description;
-        this.price = price;
+        this.description = description; // Item description
+        this.price = price; // Item price
       }
 
       total() {
@@ -168,31 +199,30 @@ $customerAddress = isset($_SESSION['customer_address']) ? $_SESSION['customer_ad
 
     class Customer {
       constructor(name, address) {
-        this.name = name;
-        this.address = address;
+        this.name = name; // Customer name
+        this.address = address; // Customer address
       }
     }
 
     class Invoice {
       constructor(invoiceNumber, customer) {
-        this.invoiceNumber = invoiceNumber;
-        this.customer = customer;
-        this.items = [];
+        this.invoiceNumber = invoiceNumber; // Unique invoice number
+        this.customer = customer; // Customer associated with the invoice
+        this.items = []; // Array to store invoice items
       }
 
+      // Method to add an item to the invoice
       addItem(description, price) {
         const newItem = new Item(description, price);
-        this.items.push(newItem);
+        this.items.push(newItem); // Add item to the invoice
       }
 
+      // Method to calculate total invoice amount
       calculateTotal() {
-        return this.items.reduce((total, item) => total + item.total(), 0);
+        return this.items.reduce((total, item) => total + item.total(), 0); // Calculate total
       }
     }
   </script>
-
-  <!-- Script for CSS
-     <script src="javascript/invoice.js"></script> -->
 </body>
 
 </html>

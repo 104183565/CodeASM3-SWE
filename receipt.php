@@ -9,14 +9,10 @@ $bookingSlots = isset($_SESSION['bookingDetails']) ? $_SESSION['bookingDetails']
 // Get customer name and address from session
 $customerName = isset($_SESSION['customer_name']) ? $_SESSION['customer_name'] : 'Guest';
 
-// Calculate total amount
-$totalAmount = 0;
-foreach ($bookingSlots as $slot) {
-  $hoursBooked = isset($slot['time']) ? intval($slot['time']) : 1;
-  $hourlyRate = 30; // Assuming the hourly rate is $30
-  $slotPrice = $hoursBooked * $hourlyRate;
-  $totalAmount += $slotPrice;
-}
+
+// Get value from form if available
+$totalAmount = isset($_POST['totalAmount']) ? $_POST['totalAmount'] : 0;
+
 ?>
 
 <!DOCTYPE html>
@@ -68,12 +64,9 @@ foreach ($bookingSlots as $slot) {
 
   <!------------------------------------------ Print out the data for Receipt ------------------------------------------>
   <div class="container mt-5">
-    <h2>Booking Confirmation</h2>
-    <!-- Confirmation message for successful booking -->
-    <p class="success-message">Thank you, <?php echo htmlspecialchars($customerName); ?>! Your booking has been
-      successfully completed.</p>
-
-    <h4>Your Booking Details</h4>
+    <h2>Receipt</h2>
+<br>
+    <h4>Your Booking Details: <?php echo htmlspecialchars($customerName); ?></h4>
     <!-- Table displaying booking details -->
     <table class="table table-bordered">
       <thead>
@@ -83,7 +76,6 @@ foreach ($bookingSlots as $slot) {
           <th>Car Type</th>
           <th>Parking Spot</th>
           <th>Booking Date</th>
-          <th>Price</th>
         </tr>
       </thead>
       <tbody>
@@ -101,7 +93,6 @@ foreach ($bookingSlots as $slot) {
             <td><?php echo htmlspecialchars($slot['car_type_text']); ?></td>
             <td><?php echo htmlspecialchars($slot['parking_type']); ?></td>
             <td><?php echo htmlspecialchars($slot['booking_date']); ?></td>
-            <td>$<?php echo number_format($slotPrice, 2); ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -109,9 +100,12 @@ foreach ($bookingSlots as $slot) {
 
     <!-- Display the total amount for all booked slots -->
     <h4>Total Amount: $<?php echo number_format($totalAmount, 2); ?></h4>
-
     <!-- Button to book another slot -->
     <a href="bookslot.php" class="btn btn-primary">Book Another Slot</a>
+    <br> <br>
+    <!-- Confirmation message for successful booking -->
+    <p class="success-message">Thank you, <?php echo htmlspecialchars($customerName); ?>! Your booking has been
+      successfully completed.</p>
   </div>
 
 </body>

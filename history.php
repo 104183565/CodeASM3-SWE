@@ -1,26 +1,27 @@
 <!------------------------------------------ Connect, Store, and Retrieve the database ------------------------------------------>
 <?php
-// Start the session
+// Start the session to access session variables
 session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); // If not logged in, redirect to the login page
-    exit();
+    // If not logged in, redirect to the login page
+    header("Location: login.php");
+    exit(); // Stop further execution
 }
 
 // Get the username from the session
 $username = $_SESSION['username'];
 
-// Connect to the database
+// Connect to the database using the settings file
 include "settings.php";
 
-// Get user_id from the session
+// Get user_id from the session for querying user-specific data
 $user_id = $_SESSION['user_id'];
 
-// Query booking history
+// Query booking history for the logged-in user
 $query = "SELECT * FROM TheParkingslot_Information WHERE user_id = $user_id";
-$result = $conn->query($query);
+$result = $conn->query($query); // Execute the query
 ?>
 
 <!DOCTYPE html>
@@ -33,11 +34,11 @@ $result = $conn->query($query);
     <meta name="description" content="Assignment 3 - SWE30003">
     <title>Smart Parking System - History</title>
 
-    <!-- Bootstrap CSS & JS  -->
+    <!-- Include Bootstrap CSS & JS for styling and responsiveness -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Script for CSS -->
+    <!-- Link to custom CSS for additional styling -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -55,13 +56,13 @@ $result = $conn->query($query);
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="home.php">Home</a>
+                            <a class="nav-link" href="home.php">Home</a> <!-- Link to home page -->
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="bookslot.php">Book Slot</a>
+                            <a class="nav-link" href="bookslot.php">Book Slot</a> <!-- Link to book a parking slot -->
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="logout.php">Log out</a>
+                            <a class="nav-link" href="logout.php">Log out</a> <!-- Link to logout -->
                         </li>
                     </ul>
                 </div>
@@ -70,46 +71,45 @@ $result = $conn->query($query);
 
         <!------------------------------------------ Booking History ------------------------------------------>
         <div class="table-container">
-            <h2>Booking History</h2>
+            <h2>Booking History</h2> <!-- Page title -->
             <h4 class="text-center mb-4">User name: <?php echo htmlspecialchars($username); ?></h4>
+            <!-- Display logged-in username -->
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Number of times booked</th>
-                        <th>Parking Type</th>
-                        <th>Address</th>
-                        <th>Vehicle Type</th>
-                        <th>Slot Time</th>
-                        <th>Booking Date</th>
-                        <th>Total</th>
+                        <th>Number of times booked</th> <!-- Column for booking count -->
+                        <th>Slot number</th> <!-- Column for slot number -->
+                        <th>Slot Time</th> <!-- Column for slot time -->
+                        <th>Vehicle Type</th> <!-- Column for vehicle type -->
+                        <th>Parking Type</th> <!-- Column for parking type -->
+                        <th>Address</th> <!-- Column for user address -->
+                        <th>Booking Date</th> <!-- Column for booking date -->
                     </tr>
                 </thead>
                 <tbody>
                     <!------------------------------------------ Retrieve the data from the database ------------------------------------------>
                     <?php
-                    if ($result->num_rows > 0) {
-                        // Hourly parking rate
-                        $hourlyRate = 30;
+                    if ($result->num_rows > 0) { // Check if there are any bookings
                         // Counter for order number
                         $counter = 1;
 
-                        // Display each row of data
-                        while ($row = $result->fetch_assoc()) {
-                            // Calculate total cost
-                            $slotTime = isset($row['slot_time']) ? intval($row['slot_time']) : 1;
-                            $totalCost = $slotTime * $hourlyRate;
+                        // Hourly rate (not used in this part, but could be for future calculations)
+                        $hourlyRate = 30;
 
+                        // Display each row of booking data
+                        while ($row = $result->fetch_assoc()) {
                             echo "<tr>
-                                <td>" . $counter++ . "</td> <!-- Order number -->
-                                <td>" . htmlspecialchars($row['parking_type']) . "</td>
-                                <td>" . htmlspecialchars($row['address']) . "</td>
-                                <td>" . htmlspecialchars($row['car_type']) . "</td>
-                                <td>" . htmlspecialchars($row['slot_time']) . "</td>
-                                <td>" . htmlspecialchars($row['booking_date']) . "</td>
-                                <td>$" . number_format($totalCost, 2) . "</td> 
+                                <td>" . $counter++ . "</td> <!-- Display booking number -->
+                                <td>" . htmlspecialchars($row['slot_number']) . "</td> <!-- Display slot number -->
+                                <td>" . htmlspecialchars($row['slot_time']) . "</td> <!-- Display slot time -->
+                                <td>" . htmlspecialchars($row['car_type_text']) . "</td> <!-- Display vehicle type -->
+                                <td>" . htmlspecialchars($row['parking_type']) . "</td> <!-- Display parking type -->
+                                <td>" . htmlspecialchars($row['address']) . "</td> <!-- Display user address -->
+                                <td>" . htmlspecialchars($row['booking_date']) . "</td> <!-- Display booking date -->
                             </tr>";
                         }
                     } else {
+                        // If no bookings found, display a message
                         echo "<tr><td colspan='8' class='text-center'>No bookings found.</td></tr>";
                     }
                     ?>
